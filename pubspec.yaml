@@ -1,7 +1,9 @@
 name: nakiri
 description: 测试插件.
 version: 0.0.1
-homepage:
+homepage: https://github.com/OCer/nakiri
+issue_tracker: https://github.com/OCer/nakiri/issues
+repository: https://github.com/OCer/nakiri.git
 
 environment:
   sdk: ">=2.16.0 <3.0.0"
