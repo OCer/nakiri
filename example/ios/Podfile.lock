@@ -1,0 +1,29 @@
+PODS:
+  - Alamofire (4.9.1)
+  - Flutter (1.0.0)
+  - nakiri (0.0.1):
+    - Alamofire
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - nakiri (from `.symlinks/plugins/nakiri/ios`)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  nakiri:
+    :path: ".symlinks/plugins/nakiri/ios"
+
+SPEC CHECKSUMS:
+  Alamofire: 85e8a02c69d6020a0d734f6054870d7ecb75cf18
+  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  nakiri: ed88ca63ec821cbe8d10898a56339d253856f13f
+
+PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+
+COCOAPODS: 1.11.3
