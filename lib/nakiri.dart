@@ -6,6 +6,31 @@ import 'package:flutter/services.dart';
 class Nakiri {
   static const MethodChannel _channel = MethodChannel('nakiri'); /// 通道名，需和iOS、android端保持一致
 
+  static const EventChannel eventChannel = EventChannel("flutter_plugin_event_nakiri"); /// 定义一个渠道事件监听；名字需要唯一且各端保持一致
+
+  static const BasicMessageChannel basicMessageChannel = BasicMessageChannel("flutter_plugin_basic_nakiri", StandardMessageCodec()); /// 定义一个渠道事件监听；名字需要唯一且各端保持一致
+
+  static int number = 1;
+
+  /// 当需要原生调用Flutter方法时，请先调用下初始化方法来增加监听
+  static void init() {
+    /// 设置原生调用Flutter时的回调
+    _channel.setMethodCallHandler((call) async {
+      switch(call.method) {
+        case "updateNumber":
+          return _updateNumber(call.arguments); /// 把结果返回给原生端
+
+        default:
+          break;
+      }
+    });
+
+    /// 设置原生发送消息给Flutter时的回调
+    basicMessageChannel.setMessageHandler((message) async {
+      return message; /// 收到消息后，可以通过return把值回复给原生
+    });
+  }
+
   /// 默认实现
   static Future<String?> get platformVersion async {
     final String? version = await _channel.invokeMethod('getPlatformVersion');
@@ -19,8 +44,8 @@ class Nakiri {
   }
 
   /// 实现iOS端新增的方法
-  static Future<int> add() async {
-    final int result = await _channel.invokeMethod('bonusPoints', [5, 8]); /// 接收一个数组或者字典作为参数传递给原生端
+  static Future<int> add([int a = 5, int b = 8]) async {
+    final int result = await _channel.invokeMethod('bonusPoints', [a, b]); /// 接收一个数组或者字典作为参数传递给原生端
     return result;
   }
 
@@ -59,5 +84,22 @@ class Nakiri {
     arg["null"] = null;
 
     await _channel.invokeMethod('testType', arg);
+  }
+
+  /// 测试原生调用Flutter方法
+  static Future<int> testAdd([int a = 3]) async {
+    final int result = await _channel.invokeMethod('testAdd', a); /// 直接传递一个值给原生端
+    return result;
+  }
+
+  /// 测试原生发送消息给Flutter
+  static Future<int> sender([int a = 8]) async {
+    final int result = await _channel.invokeMethod('basic', a); /// 直接传递一个值给原生端
+    return result;
+  }
+
+  /// 实现原生调用Flutter方法
+  static int _updateNumber(int value) {
+    return number + value;
   }
 }

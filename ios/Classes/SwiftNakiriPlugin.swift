@@ -3,10 +3,27 @@ import UIKit
 
 public class SwiftNakiriPlugin: NSObject, FlutterPlugin {
 
+    private static var eventChannel: ZTEventChannel!
+    
+    private static var methodChannel: FlutterMethodChannel!
+    
+    private static var basicMessageChannel: FlutterBasicMessageChannel!
+    
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "nakiri", binaryMessenger: registrar.messenger())
+        methodChannel = FlutterMethodChannel(name: "nakiri", binaryMessenger: registrar.messenger())
         let instance = SwiftNakiriPlugin()
-        registrar.addMethodCallDelegate(instance, channel: channel)
+        registrar.addMethodCallDelegate(instance, channel: methodChannel)
+        
+        // 原生和Flutter互相发送数据
+        basicMessageChannel = FlutterBasicMessageChannel(name: "flutter_plugin_basic_nakiri", binaryMessenger: registrar.messenger())
+        
+        // 设置消息接收器，用来接收数据；当Flutter端发送消息过来的时候，会自动回调；设置为nil时取消监听
+        basicMessageChannel.setMessageHandler { value, reply in
+            reply(value as! Int + 1) // 使用reply给Flutter端回复消息
+        }
+        
+        // 原生实时发送数据流给Flutter
+        eventChannel = ZTEventChannel(binaryMessenger: registrar.messenger())
     }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -15,6 +32,20 @@ public class SwiftNakiriPlugin: NSObject, FlutterPlugin {
         } else if call.method == "bonusPoints" { // 使用参数的实现
             let array = call.arguments as! Array<Int>
             result(array[0] + array[1])
+        } else if call.method == "testAdd" { // 原生调用Flutter的方法
+            let number = call.arguments as! Int
+            
+            // 调用Flutter方法
+            SwiftNakiriPlugin.methodChannel.invokeMethod("updateNumber", arguments: (number + 1)) { value in
+                result(value) // 获取Flutter方法的返回值，并返回给Flutter
+            }
+        } else if call.method == "basic" { // 原生给Flutter发送数据
+            let number = call.arguments as! Int
+            
+            // 给Flutter发送数据，并等待Flutter端回复
+            SwiftNakiriPlugin.basicMessageChannel.sendMessage(number + 1) { value in
+                result(value)
+            }
         } else if call.method == "getPlatformVersion" { // 默认的实现
             result("iOS " + UIDevice.current.systemVersion)
         } else if call.method == "testType" { // 测试数据类型
