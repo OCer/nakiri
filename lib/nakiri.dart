@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/services.dart';
 
 class Nakiri {
+  
   static const MethodChannel _channel = MethodChannel('nakiri'); /// 通道名，需和iOS、android端保持一致
 
   static const EventChannel eventChannel = EventChannel("flutter_plugin_event_nakiri"); /// 定义一个渠道事件监听；名字需要唯一且各端保持一致
